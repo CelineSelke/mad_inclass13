@@ -57,18 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RegisterEmailSection(auth: _auth),
-            EmailPasswordForm(auth: _auth),
-            SizedBox(height: 20),
-            ElevatedButton(onPressed:() => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfileScreen(title: "Profile Screen")),
-              ), child: Text("Profile Screen"))
-          ],
-        ),
+        child: AuthenticationScreen(title: "Welcome")
       ),
     );
   }
@@ -362,6 +351,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             SizedBox(height: 15), 
             ElevatedButton(onPressed: _changePassword, child: Text("Change Password"))
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class AuthenticationScreen extends StatefulWidget {
+  AuthenticationScreen({Key? key, required this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _AuthenticationScreenState createState() => _AuthenticationScreenState();
+}
+
+
+class _AuthenticationScreenState extends State<AuthenticationScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(onPressed:() => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Scaffold(
+                  appBar: AppBar(title: Text("Register")),
+                  body: RegisterEmailSection(auth: _auth),
+                ),
+              ),
+            ), child: Text("Register")),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed:() => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Scaffold(
+                  appBar: AppBar(title: Text("Login")),
+                  body: EmailPasswordForm(auth: _auth),
+                ),
+              ),
+            ), child: Text("Login")),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed:() => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen(title: "Profile Screen")),
+            ), child: Text("Profile Screen"))
           ],
         ),
       ),
