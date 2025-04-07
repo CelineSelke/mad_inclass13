@@ -62,6 +62,11 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             RegisterEmailSection(auth: _auth),
             EmailPasswordForm(auth: _auth),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed:() => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen(title: "Profile Screen")),
+              ), child: Text("Profile Screen"))
           ],
         ),
       ),
@@ -259,6 +264,103 @@ class _EmailPasswordFormState extends State<EmailPasswordForm> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ProfileScreen extends StatefulWidget {
+  ProfileScreen({Key? key, required this.title}) : super(key: key);
+  final String title;
+
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final TextEditingController _passwordController = TextEditingController();
+  String? email = "Not Signed In";
+
+  @override
+  void initState() {
+    super.initState();
+    User? user = _auth.currentUser;
+    if (user != null) {
+      email = user.email;
+    }
+  }
+
+  void _changePassword() async {
+    User? user = _auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No user is signed in.')),
+      );
+      return;
+    }
+
+    if(_passwordController.text.length >= 6) {
+      try {
+        await user.updatePassword(_passwordController.text);
+        _passwordController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Password changed successfully.')),
+        );
+      } catch (error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error changing password: $error')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please make password 6 characters or greater')),
+      );
+    }
+  }
+
+  void _signOut() async {
+    await _auth.signOut();
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Signed out successfully'),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        actions: <Widget>[
+          ElevatedButton(
+            onPressed: () {
+              _signOut();
+            },
+            child: Text('Sign Out'),
+          ),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text("Profile Email: \n $email"),
+            SizedBox(height: 25), 
+            Text("Change Password: "),
+            TextFormField(
+              controller: _passwordController,
+              decoration: InputDecoration(labelText: 'Password'),
+              validator: (value) {
+                if(value?.isEmpty??true) {
+                  return 'Please enter some text';
+                }
+                return null;
+              },
+            ),
+            SizedBox(height: 15), 
+            ElevatedButton(onPressed: _changePassword, child: Text("Change Password"))
+          ],
+        ),
       ),
     );
   }
