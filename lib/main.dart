@@ -320,10 +320,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _signOut() async {
+    User? user = _auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No user is signed in.')),
+      );
+      return;
+    }
+
     await _auth.signOut();
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text('Signed out successfully'),
     ));
+    Navigator.pop(context);
   }
 
   @override
@@ -344,7 +353,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text("Profile Email: \n $email"),
+            Text("Profile Email:"),
+            Text("$email"),
             SizedBox(height: 25), 
             Text("Change Password: "),
             TextFormField(
