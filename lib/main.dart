@@ -81,6 +81,7 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
   bool _success = false;
   bool _initialState = true;
   String? _userEmail;
@@ -115,18 +116,24 @@ class _RegisterEmailSectionState extends State<RegisterEmailSection> {
             controller: _emailController,
             decoration: InputDecoration(labelText: 'Email'),
             validator: (value) {
-              if (value?.isEmpty??true) {
+              if (value == null || value.isEmpty) {
                 return 'Please enter some text';
               }
+              else if (!emailRegex.hasMatch(value)) {
+                return 'Please enter a valid email';
+              }
               return null;
-            },
+              },
           ),
           TextFormField(
             controller: _passwordController,
             decoration: InputDecoration(labelText: 'Password'),
             validator: (value) {
-              if(value?.isEmpty??true) {
+              if(value == null || value.isEmpty) {
                 return 'Please enter some text';
+              }
+              else if (value.length < 6) {
+                return 'Please enter at least 6 characters';
               }
               return null;
             },
